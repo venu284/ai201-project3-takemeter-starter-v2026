@@ -116,48 +116,90 @@ For mixed forms, classify the main point: a sincere question stays `question` ev
 
 ## The Dataset
 
-<!-- Where you collected from, how you labelled, your counts, and three hard
-     cases. -->
-
 **Where the posts came from:**
 
-**How I labelled them:** <!-- Cold first? Pre-labelled with AI and corrected?
-Say so plainly — the disclosure is required, not penalised. -->
+I collected 200 complete individual comments from three public r/formula1 threads. Each CSV record contains one whole comment, including its paragraph breaks. All examples remain in one unsplit [labels.csv](labels.csv) with `text,label,note`; the notebook will make the 70/15/15 split.
+
+| Source thread | Comments |
+|---|---:|
+| [Daily discussion](https://www.reddit.com/r/formula1/comments/1x3u2qv/ask_rformula1_anything_daily_discussion_thread/) | 31 |
+| [Singapore pre-race discussion](https://www.reddit.com/r/formula1/comments/1x33eva/2026_singapore_grand_prix_prerace_discussion/) | 37 |
+| [Singapore post-race discussion](https://www.reddit.com/r/formula1/comments/1x38muu/2026_singapore_grand_prix_postrace_discussion/) | 132 |
+| **Total** | **200** |
+
+Codex helped collect the comments from cached public browser renderings after direct Reddit JSON access returned HTTP 403. Collection took 12 minutes 30 seconds. Selection used source order before any labels were assigned: the retained daily and pre-race comments, then 132 comments spaced through the visible post-race comments. An extraction error omitted one valid daily comment together with an adjacent deleted-comment notice, so this is not complete coverage of all visible comments. There was no supplemental collection aimed at particular labels.
+
+[data/label_sources.csv](data/label_sources.csv) records a text hash, comment ID, permalink, and thread URL for every example. All 200 bodies matched the saved thread captures; browser spotchecks also matched the longest comment from each thread. These checks used cached pages. Only 27 individual permalink headers were readable, and 11 had separately saved body text; the other 173 permalinks returned cache misses. I cannot claim independent live verification of every comment.
+
+**How I labelled them:**
+
+I chose 20 labels myself before AI pre-labeling, using the four definitions above. Those rows are marked `cold`, and my original choices are preserved. I then asked Codex to pre-label all 180 remaining comments at once, with reasons and possible alternative labels. I reviewed every comment and initially accepted all suggestions. During the hard-case review, I changed record 144 from `analysis` to `reaction` and records 165 and 168 from `hot_take` to `reaction`. All 180 assisted rows are marked `pre-labelled, checked`. The original AI suggestions and the cold snapshot are retained in local review records.
 
 **Counts per label:**
 
 | Label | Count | Share |
 |---|---|---|
-|  |  |  |
-|  |  |  |
-|  |  |  |
-| **Total** |  | 100% |
+| `analysis` | 19 | 9.5% |
+| `hot_take` | 32 | 16.0% |
+| `question` | 17 | 8.5% |
+| `reaction` | 132 | 66.0% |
+| **Total** | **200** | **100%** |
+
+The 200-example goal is met, so no stop-rule exception applies. No label exceeds the milestone's 70% cap. My stricter [acceptance criterion 3](criteria.md#3-each-label-represents-15-to-40-of-the-dataset) is a **miss**: `analysis` and `question` are below 15%, and `reaction` exceeds 40%. I kept the original target and did not change labels to force balance.
+
+These counts describe this collected file, not the community's natural distribution. The post-race thread supplies 66% of the examples, and several distinct comments react to the same cooldown-room muting. There are no exact duplicates or duplicates after case and whitespace normalization, but near copies such as records 88, 112, and 123 remain because they have different wording and source IDs. This event concentration may make a random split less representative of new races. Always predicting `reaction` would match 66% of this full file, so overall accuracy will need to be read alongside per-label F1. Model and confidence results have not been measured yet.
 
 **Three hard cases**
 
-<!-- Any post that made you pause: what it was, which two labels it could have
-     been, and what you chose. These are worth more than the easy 190. -->
+Record numbers refer to CSV records, excluding the header.
 
-**1.**
-> *The post:*
->
-> *Could have been:*
->
-> *I chose, because:*
+**1. CSV record 23**
 
-**2.**
-> *The post:*
->
-> *Could have been:*
->
-> *I chose, because:*
+> Hamilton was more than 60 points clear of Verstappen few months ago. Now he is only 8 points ahead.This is the guy who wanted Ferrari to make him the number 1 driver btw.
 
-**3.**
-> *The post:*
+**Could have been:** `hot_take` or `analysis`.
+
+**I chose, because:** I chose `hot_take` because it includes points totals, but its main point is a dismissive judgment without explaining why those numbers justify the team-priority claim.
+
+[Original comment](https://www.reddit.com/r/formula1/comments/1x3u2qv/comment/pfeujbn/)
+
+**2. CSV record 144**
+
+> Perfect sweep by Verstappen
 >
-> *Could have been:*
+> Pole in Sprint Q
 >
-> *I chose, because:*
+> P1 in Sprint
+>
+> Pole in Q
+>
+> P1 in Race
+
+**Could have been:** `analysis` or `reaction`.
+
+**I chose, because:** I chose `reaction` because I read it as a celebration and list of results rather than an interpretation or prediction.
+
+[Original comment](https://www.reddit.com/r/formula1/comments/1x38muu/comment/pf8tii3/)
+
+**3. CSV record 165**
+
+> Ferrari truly snatching defeat from the jaws of victory today.
+
+**Could have been:** `hot_take` or `reaction`.
+
+**I chose, because:** I chose `reaction` because I read it as an immediate response in the race context. Without that context, I would read it as `hot_take`.
+
+[Original comment](https://www.reddit.com/r/formula1/comments/1x38muu/comment/pf8prs3/)
+
+**Related correction, CSV record 168:**
+
+> If it wasn't for the Ferrari clowning, this race would have been a complete snoozefest.
+
+I also considered `hot_take` and chose `reaction` for the same context-dependent reason as record 165.
+
+[Original comment](https://www.reddit.com/r/formula1/comments/1x38muu/comment/pf8q2q2/)
+
+**Consistency limitation:** The decisions for 165 and 168 depend on race context outside the model's comment text. They also overlap with the existing `hot_take` example, "Another Ferrari strategic masterclass." I have recorded my choices, but this boundary remains a consistency risk. The model may not be able to recover a distinction that requires context it does not receive.
 
 ---
 
@@ -181,26 +223,21 @@ of next unit's variance. -->
 
 ## How I Used AI
 
-<!-- Two specific moments — what you asked, what came back, what you changed.
+**Moment 1: Testing label boundaries**
 
-     ⚠️ Plus disclosure of any pre-labelling. If you had a model pre-label a
-     batch and then read and corrected every one, say that. It's an allowed
-     workflow and disclosing it costs you nothing. Not disclosing it is the
-     problem. -->
+- *What I asked for:* Eight synthetic F1 comments on the boundaries between my four labels, including fact-plus-claim and sincere-versus-rhetorical question cases.
+- *What came back:* Probes such as "Verstappen is eight points behind Hamilton, so Ferrari's development has stalled." The number is checkable, but it does not establish the claimed cause.
+- *What I changed:* I tightened `analysis` to require a specific detail connected to the conclusion, and wrote the sincere-versus-rhetorical question rule. [MILESTONE_2.md](MILESTONE_2.md) preserves all eight probes and their decisions. None is in the training CSV.
 
-**Moment 1**
+**Moment 2: Reviewing AI pre-labels**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
-
-**Moment 2**
-
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* After my 20 cold labels, I asked Codex to pre-label all 180 remaining comments so I could review them together, instead of using the planned batches of 25.
+- *What came back:* A label and reason for every comment, with alternative labels for 61. The initial suggestions included `analysis` for record 144's list of Verstappen's session results, and `hot_take` for records 165 and 168.
+- *What I changed:* I initially accepted all 180 after review, then corrected those three to `reaction` during the hard-case discussion. I confirmed the reasons for records 23 and 144, supplied record 165 as my third hard case, and identified 168 as a related correction. The dataset section records the context limitation for 165 and 168 rather than claiming the boundary is fully resolved.
 
 **Pre-labelling disclosure:**
+
+Codex suggested labels for 180 of 200 real comments. I reviewed every one; they are marked `pre-labelled, checked`. I chose the other 20 before that assistance, confirmed that those choices were mine, and kept their `cold` labels unchanged. The CSV contains no synthetic examples. Codex also assisted collection, acceptance-criteria drafting and review, validation, and this write-up. No model training or confidence evaluation has run.
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
