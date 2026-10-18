@@ -41,8 +41,12 @@
 
 <!-- Your community, and what your classifier sorts posts into. Three or four
      sentences. -->
-
-
+TakeMeter will classify individual public comments from r/formula1. The four
+labels distinguish supported interpretations, unsupported takes, answerable
+questions, and reactions or simple updates. I chose a fourth label for
+questions as the optional stretch feature before collecting or labeling the
+200 examples; the reading showed that a genuine request for an answer is a
+different kind of comment from a cheer or joke.
 
 ---
 
@@ -54,36 +58,60 @@
      The decision rule is worth a point on its own and it's the thing most
      people leave out. Every taxonomy has a hardest boundary. Name yours. -->
 
-### `label_one`
+### `analysis`
 
-**Definition:**
+**Definition:** An F1 interpretation or prediction that connects its conclusion to a specific, checkable event, quote, comparison, or number offered as support.
 
-**Example 1:**
->
+**Example 1:** [Firefox72 in the daily discussion](https://www.reddit.com/r/formula1/comments/1x3u2qv/ask_rformula1_anything_daily_discussion_thread/):
+> Nowhere is a bit harsh on Ferrari in 2009
+> They secured a win and scored a bunch of podiums after the upgrades. Somewhere there or there about with Mclaren.
+> The difference was Ferrari only had 1 driver for almost half a season post Massa's accident and yet still only finished just 1 point behind Mclaren.
 
-**Example 2:**
->
+**Example 2:** [droppokeguy in the pre-race discussion](https://www.reddit.com/r/formula1/comments/1x33eva/2026_singapore_grand_prix_prerace_discussion/):
+> The humidity makes it impossible to dry in more than 2~H + no sun
+> 2022 it took half the race before it was dry enough for slicks
+> So if it rains like an hour or so before it would be gambling
 
-### `label_two`
+### `hot_take`
 
-**Definition:**
+**Definition:** An F1 judgment about performance or strategy, prediction, or proposed strategic action that does not connect its conclusion to a specific, checkable supporting detail, even if the claim may be true.
 
-**Example 1:**
->
+**Example 1:** [T4Gx in the post-race discussion](https://www.reddit.com/r/formula1/comments/1x38muu/2026_singapore_grand_prix_postrace_discussion/):
+> Liam Lawson has upped his game. Deserves to be in F1 for a long time.
 
-**Example 2:**
->
+**Example 2:** [wfelt871 in the post-race discussion](https://www.reddit.com/r/formula1/comments/1x38muu/2026_singapore_grand_prix_postrace_discussion/):
+> Another Ferrari strategic masterclass
+
+### `question`
+
+**Definition:** A comment primarily asking for an answerable F1 fact, explanation, or source while withholding its own conclusion.
+
+**Example 1:** [Whatisreality228 in the daily discussion](https://www.reddit.com/r/formula1/comments/1x3u2qv/ask_rformula1_anything_daily_discussion_thread/):
+> Verstappen is on form to win the title next year, yes or no? Why?
+
+**Example 2:** [Trixie960 in the daily discussion](https://www.reddit.com/r/formula1/comments/1x3u2qv/ask_rformula1_anything_daily_discussion_thread/):
+> Is there anywhere to continue watching the coverage after the race? Kayo cut off when they went to show the interviews with ferrari
+
+### `reaction`
+
+**Definition:** A comment primarily reporting or responding to one F1 moment with a fact, feeling, joke, or cheer, without advancing a broader judgment or seeking an answer.
+
+**Example 1:** [Rude_Review4303 in the pre-race discussion](https://www.reddit.com/r/formula1/comments/1x33eva/2026_singapore_grand_prix_prerace_discussion/):
+> Lock the fuck in Oscar..
+
+**Example 2:** [Cumzooka in the post-race discussion](https://www.reddit.com/r/formula1/comments/1x38muu/2026_singapore_grand_prix_postrace_discussion/):
+> Lmaooo all the swearing
 
 ### The hardest boundary
 
-**Which two labels:**
+**Which two labels:** `analysis` and `hot_take`.
 
-**The decision rule I used every time:**
-<!-- e.g. "If the post names a specific checkable fact, it's `analysis`, even
-     if the tone is heated." -->
+**Borderline real post:** [Huge-Revolution2416 in the pre-race discussion](https://www.reddit.com/r/formula1/comments/1x33eva/2026_singapore_grand_prix_prerace_discussion/):
+> Singapore always looks like a one-stop on paper until a Safety Car flips the whole race upside down.
 
+**The decision rule I will use every time:** A named mechanism alone is not supporting evidence. Choose `analysis` only when the comment identifies a specific checkable event, quote, comparison, or number and connects that detail to its conclusion; otherwise choose `hot_take` for a judgment or prediction. This post predicts a strategy change but cites no particular race or result, so it is `hot_take`.
 
-
+For mixed forms, classify the main point: a sincere question stays `question` even if it gives context; a rhetorical question that asserts a stance follows `analysis` or `hot_take`; a bare event report stays `reaction` until it draws a broader conclusion. Tone, length, votes, and whether the F1 claim is actually correct do not determine the label.
 ---
 
 ## The Dataset
