@@ -77,3 +77,42 @@ deciding where to spend review time.
 Keep these original targets when reporting Unit 6 results. A missed target
 stays a miss. If a criterion cannot be measured as written, append a revision
 and its reason below the original rather than replacing or lowering the target.
+
+## Measurement clarification for criterion 5
+
+The 0.20 target is unchanged. Evaluate its exact boundary using the number
+of correct predictions in each confidence group. Direct floating-point
+subtraction can represent `1.0 - 0.8` as `0.19999999999999996`, even though
+10 correct predictions versus 8 out of 10 is exactly a 20-percentage-point gap.
+
+The notebook saves each group's accuracy and their shared `n_per_third`.
+Recover the whole-number counts from those saved values and compare them:
+
+```python
+n = confidence["n_per_third"]
+top = round(confidence["accuracy_most_confident_third"] * n)
+bottom = round(confidence["accuracy_least_confident_third"] * n)
+met = 5 * (top - bottom) >= n
+```
+
+Here, `confidence` is one seed's saved confidence report. Rounding recovers
+the integer number of correct predictions; it does not round an accuracy
+or lower the acceptance threshold. Apply this check separately to each seed.
+
+## Interpreting confidence results
+
+With about 10 comments per confidence group, one prediction changes a group's
+accuracy by about 10 percentage points. Results across the three seeds help
+show this variation, but the splits reuse the same dataset and are not
+independent samples of the community.
+
+Criteria 4 and 5 test the most confident third's reliability and its
+advantage over the least confident third. They do not measure the middle
+third, so passing them does not establish a useful review ordering across
+all comments.
+
+A highly accurate classifier can miss criterion 5 because there are too few
+errors to produce a 20-percentage-point gap. A perfect classifier has a gap
+of zero and still misses that target. Preserve that verdict and explain the
+observed accuracy and error counts before diagnosing the miss as a confidence
+or classification problem.
