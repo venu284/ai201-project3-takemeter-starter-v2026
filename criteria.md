@@ -1,143 +1,79 @@
-# Acceptance criteria — TakeMeter
+# Acceptance criteria for TakeMeter
 
-Five criteria that say what "working" means for this classifier, written in
-unit 5 **before** anything was trained.
+These targets are set in Unit 5 before training. TakeMeter classifies public
+r/formula1 comments as `analysis`, `hot_take`, `question`, or `reaction`.
+I want to use model confidence to prioritize comments for manual review.
 
-**All five are yours this time.** None are given. You've had two projects of
-practice.
+## How to check the criteria
 
-An acceptance criterion names a number. *"The model is accurate"* is an
-opinion. *"Every label has an F1 of at least 0.60 on the held-out set"* is a
-criterion.
+Use the notebook's stratified 70% training, 15% validation, and 15% held-out
+test splits. Check criteria 1, 2, 4, and 5 separately for seeds 42, 7, and
+2024 using `results_three_seeds_before.json` in Unit 6. A criterion is met
+only if it holds for all three seeds, using the unrounded scores rather
+than their average. Check criterion 3 once on the complete `labels.csv`.
 
-Under each, write a sentence or two on **why that number**. A reason that says
-something about your data or your taxonomy earns credit — *"I picked 0.60 F1
-for `reaction` because it's my smallest label and I only have about 50
-examples of it"*. A reason that could be attached to any project does not.
+For criteria 4 and 5, use the notebook's confidence report. Confidence is
+the highest predicted class probability. The report ranks the test comments
+by confidence and takes the highest and lowest `floor(n_test / 3)` comments,
+with at least one comment per group. At the planned 200-example dataset size,
+each test split has about 30 comments and each confidence group has about 10.
+These are relative confidence groups, not a claim that a probability of 0.80
+is calibrated to 80% accuracy.
 
-> Missing your own targets next unit costs you nothing. Setting a target so
-> easy you can't miss it does.
+## 1. Overall held-out accuracy is at least 0.65
 
----
+The `accuracy` score must be at least **0.65** in each seed's held-out test
+split.
 
-## Pick numbers you can defend
+**Why this target:** I would call sorting useful if roughly two out of three
+F1 comments receive the right label before review. With four labels, uniform
+random guessing averages 25%, so 65% requires a substantial improvement while
+allowing mistakes on sarcastic takes and comments that mix questions with claims.
 
-Not numbers that sound impressive. Three labels means a coin-flip guesser gets
-about 33%, so a target of 0.40 is barely a target. Your number should sit
-somewhere you'd honestly call useful.
+## 2. Every label has a held-out F1 of at least 0.50
 
-**Cover at least three of these five areas.** They're here as prompts, not as a
-form to fill in — a criterion that fits none of them is fine if it names a
-number.
+Each of `analysis`, `hot_take`, `question`, and `reaction` must have a
+`per_label` F1 score of at least **0.50** in each seed's held-out test split.
 
-| Area | A question it could answer |
-|---|---|
-| Overall accuracy | How often does it need to be right to be worth using? |
-| Per-label performance | Is one label allowed to be much worse than the others? |
-| Balance | How lopsided can your label counts get before it's a problem? |
-| Consistency | If someone else labelled the same posts, how often should you agree? |
-| Confidence | Should a confident prediction be right more often than an unsure one? |
+**Why this target:** A useful review workflow needs to recognize genuine
+questions and supported analysis as well as reactions and unsupported takes.
+I chose a 0.50 floor because 200 examples divided among four labels leave small
+test counts, and the `analysis` versus `hot_take` boundary requires detecting
+whether a specific detail actually supports the conclusion.
 
-Two things worth knowing before you pick numbers, because both will affect
-whether you hit them:
+## 3. Each label represents 15% to 40% of the dataset
 
-- **Your smallest label will have the jumpiest score.** If a label has 50
-  examples, about 8 land in the test split. An F1 computed on 8 examples moves
-  a lot between seeds. A target for that label should be looser than one for
-  your biggest label, and saying so is a good reason.
-- **Unit 6 tests across three seeds, and the target has to hold across all
-  three.** A target of 0.65 against results of 0.71, 0.62, 0.68 is a **miss**.
-  Pick with that in mind — it is stricter than it first sounds.
+In the complete `labels.csv`, each of the four labels must account for at
+least **15%** and at most **40%** of all examples, including both endpoints.
+For exactly 200 examples, that means 30 to 80 examples per label.
 
----
+**Why this target:** Race threads contain many short cheers and strategy
+verdicts, which could crowd out supported analysis and answerable questions.
+The 15% floor gives each label at least 30 examples at the planned size,
+while the 40% ceiling allows unequal counts without one category dominating.
 
-## 1.
+## 4. Accuracy on the most confident third is at least 0.80
 
-<!-- Your criterion. It must name a number. -->
+The confidence report's `accuracy_most_confident_third` must be at least
+**0.80** in each seed's held-out test split.
 
+**Why this target:** I want to give confident predictions lower review
+priority only if at least four out of five are correct. In a group of about
+10 test comments, this allows about two mistakes, so even confident predictions
+still need occasional checking, especially around the evidence boundary.
 
+## 5. Confidence separates more reliable predictions by at least 0.20
 
-**Why this target:**
+The confidence report's `accuracy_most_confident_third` minus
+`accuracy_least_confident_third` must be at least **0.20**, or 20 percentage
+points, in each seed's held-out test split.
 
+**Why this target:** Confidence helps me prioritize manual review only if the
+least confident comments contain more errors than the most confident ones.
+With about 10 comments in each group, a 0.20 gap means about two additional
+correct predictions in the most confident group, a useful difference when
+deciding where to spend review time.
 
-
----
-
-## 2.
-
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
-
----
-
-## 3.
-
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
-
----
-
-## 4.
-
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
-
----
-
-## 5.
-
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
-
-
----
-
-<!-- ─────────────────────────────────────────────────────────────────────────
-     UNIT 6 — read this before you change anything above.
-
-     If a criterion turns out to be BROKEN rather than merely unmet, you can
-     revise it, and that earns credit. But never delete or edit the original
-     line. Add the revision underneath, like this:
-
-         ## 2. Every label performs acceptably
-
-         The model performs well on all labels.
-
-         **Why this target:** ...
-
-         > **Revised in unit 6:** Every label has an F1 of at least 0.60 on
-         > the held-out set.
-         >
-         > **Why revised:** "performs well" gave me nothing to check. I
-         > couldn't produce a verdict from it at all.
-
-     That's a revision because the criterion couldn't be MEASURED.
-
-     Lowering a target because you missed it is not a revision, and it costs
-     you the point:
-
-         ✗ "Overall accuracy of at least 0.65" → "at least 0.55", because
-            0.65 turned out to be optimistic for 200 examples.
-
-     A number you missed stays where it is, gets diagnosed, and gets a fix
-     attempted. That's where the points are.
-     ───────────────────────────────────────────────────────────────────────── -->
+Keep these original targets when reporting Unit 6 results. A missed target
+stays a miss. If a criterion cannot be measured as written, append a revision
+and its reason below the original rather than replacing or lowering the target.
