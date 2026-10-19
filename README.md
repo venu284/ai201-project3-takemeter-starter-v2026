@@ -157,7 +157,7 @@ The 17 unchanged cold rows retain `cold`. The three corrected rows have notes be
 
 The 200-example goal is met, so no stop-rule exception applies. No label exceeds the milestone's 70% cap. My stricter [acceptance criterion 3](criteria.md#3-each-label-represents-15-to-40-of-the-dataset) is a **miss**: `analysis` and `question` are below 15%, and `reaction` exceeds 40%. I kept the original target and did not change labels to force balance.
 
-These counts describe this collected file, not the community's natural distribution. The post-race thread supplies 66% of the examples, and several distinct comments react to the same cooldown-room muting. There are no exact duplicates or duplicates after case and whitespace normalization, but near copies such as records 88, 112, and 123 remain because they have different wording and source IDs. This event concentration may make a random split less representative of new races. Always predicting `reaction` would match 66% of this full file, so overall accuracy will need to be read alongside per-label F1. Model and confidence results have not been measured yet.
+These counts describe this collected file, not the community's natural distribution. The post-race thread supplies 66% of the examples, and several distinct comments react to the same cooldown-room muting. There are no exact duplicates or duplicates after case and whitespace normalization, but near copies such as records 88, 112, and 123 remain because they have different wording and source IDs. This event concentration may make a random split less representative of new races. Always predicting `reaction` would match 66% of this full file, so overall accuracy will need to be read alongside per-label F1. Milestone 5 generated the model and confidence results; their interpretation is deferred to the next unit.
 
 **Three hard cases**
 
@@ -215,19 +215,27 @@ I also considered `hot_take` and chose `reaction` for the same context-dependent
 
 ## The Training Run
 
-<!-- Your starting model, your settings, and anything you changed and why. -->
+**Base model:** `distilbert-base-uncased`, fine-tuned on the four F1 labels.
 
-**Base model:**
+**Settings:** 3 epochs, learning rate `2e-5`, batch size 16, maximum length 128 tokens, seed 42. The CSV retains whole comments; the tokenizer truncates model inputs to the configured token limit.
 
-**Settings:** <!-- epochs, learning rate, batch size, seed -->
+**Device:** `mps`, recorded as `Apple Silicon GPU (MPS)` in [results.json](results.json), using PyTorch `2.14.1`. I ran the notebook from the repository with its `.venv` kernel. Hardware can affect the arithmetic and resulting scores even with the same data and seed, so this device is part of the run record.
 
-**Anything I changed from the defaults, and why:**
+**Anything I changed from the defaults, and why:** No model, hyperparameter, or seed changes. I entered my name and email, then ran sections 1–5 in order. The dataset was committed in `6ad6f40` before training; neither the dataset nor the acceptance criteria changed during the run.
 
-**Split sizes:** <!-- train / val / test, and per-label counts in the test
-split. If a label had fewer than about 8 in test, say so — it explains a lot
-of next unit's variance. -->
+**Split sizes:** The notebook produced 139 training, 31 validation, and 30 test comments. Its floating-point validation-size calculation rounds up to 31; I kept that output rather than making a separate split.
 
+| Label | Train | Validation | Test |
+|---|---:|---:|---:|
+| `analysis` | 11 | 3 | 3 |
+| `hot_take` | 24 | 5 | 5 |
+| `question` | 12 | 3 | 2 |
+| `reaction` | 92 | 20 | 20 |
+| **Total** | **139** | **31** | **30** |
 
+The test set has fewer than eight examples for `analysis` (3), `hot_take` (5), and `question` (2). Their metrics will be sensitive to individual examples and split changes. Section 2 also warned that `reaction` is 66% of the full dataset and that `analysis` and `question` have only 17 examples each. There were no `[FIX ME]` errors. The personal 15% to 40% balance target remains a miss.
+
+**Run evidence:** Training completed all 3 epochs and 27 steps. Section 5 wrote [results.json](results.json) and the 30 held-out comments in [test_split.csv](test_split.csv). The executed notebook preserves the outputs. Warnings about the missing progress widget, newly initialized classification weights, and MPS pinned memory did not prevent completion. Sections 6–7 remain unexecuted; score interpretation and the three-seed comparison belong to the next unit.
 
 ---
 
@@ -247,7 +255,7 @@ of next unit's variance. -->
 
 **Pre-labelling disclosure:**
 
-Codex initially pre-labeled 180 of 200 real comments. I reviewed every one; they are marked `pre-labelled, checked`. I chose the other 20 before that assistance and confirmed that those choices were mine. I later accepted AI-reviewed corrections to three of those 20, so the final training labels contain 183 comments whose labels received AI input and 17 unchanged cold choices. Original cold labels remain preserved separately and in the corrected rows' notes. The CSV contains no synthetic examples. Codex also assisted collection, acceptance-criteria drafting and review, validation, and this write-up. No model training or confidence evaluation has run.
+Codex initially pre-labeled 180 of 200 real comments. I reviewed every one; they are marked `pre-labelled, checked`. I chose the other 20 before that assistance and confirmed that those choices were mine. I later accepted AI-reviewed corrections to three of those 20, so the final training labels contain 183 comments whose labels received AI input and 17 unchanged cold choices. Original cold labels remain preserved separately and in the corrected rows' notes. The CSV contains no synthetic examples. Codex also assisted collection, acceptance-criteria drafting and review, validation, and this write-up. I ran the Milestone 5 notebook; Codex checked the saved outputs and artifacts and helped document the run. Performance interpretation remains for the next unit.
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
