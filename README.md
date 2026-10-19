@@ -41,12 +41,7 @@
 
 <!-- Your community, and what your classifier sorts posts into. Three or four
      sentences. -->
-TakeMeter will classify individual public comments from r/formula1. The four
-labels distinguish supported interpretations, unsupported takes, answerable
-questions, and reactions or simple updates. I chose a fourth label for
-questions as the optional stretch feature before collecting or labeling the
-200 examples; the reading showed that a genuine request for an answer is a
-different kind of comment from a cheer or joke.
+TakeMeter classifies individual public comments from r/formula1 as `analysis`, `hot_take`, `question`, or `reaction`. These labels distinguish supported interpretations, unsupported judgments, sincere requests for answers, and immediate responses or simple updates. The project uses 200 complete labeled comments for training and evaluation. I want to use prediction confidence to prioritize comments for manual review.
 
 ---
 
@@ -255,7 +250,7 @@ The test set has fewer than eight examples for `analysis` (3), `hot_take` (5), a
 
 **Pre-labelling disclosure:**
 
-Codex initially pre-labeled 180 of 200 real comments. I reviewed every one; they are marked `pre-labelled, checked`. I chose the other 20 before that assistance and confirmed that those choices were mine. I later accepted AI-reviewed corrections to three of those 20, so the final training labels contain 183 comments whose labels received AI input and 17 unchanged cold choices. Original cold labels remain preserved separately and in the corrected rows' notes. The CSV contains no synthetic examples. Codex also assisted collection, acceptance-criteria drafting and review, validation, and this write-up. I ran the Milestone 5 notebook; Codex checked the saved outputs and artifacts and helped document the run. Performance interpretation remains for the next unit.
+Codex initially pre-labeled 180 of 200 real comments. I reviewed every one; they are marked `pre-labelled, checked`. I chose the other 20 before that assistance and confirmed that those choices were mine. I later accepted AI-reviewed corrections to three of those 20, so the final training labels contain 183 comments whose labels received AI input and 17 unchanged cold choices. Original cold labels remain preserved separately and in the corrected rows' notes. The CSV contains no synthetic examples. Codex also helped collect cached public comments, draft and review the acceptance criteria, validate the dataset, and document my work through Milestone 5. I ran sections 1–5 of `takemeter.ipynb`; Codex reviewed the saved outputs and checked `results.json` and `test_split.csv`.
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
