@@ -133,14 +133,24 @@ Codex helped collect the comments from cached public browser renderings after di
 
 **How I labelled them:**
 
-I chose 20 labels myself before AI pre-labeling, using the four definitions above. Those rows are marked `cold`, and my original choices are preserved. I then asked Codex to pre-label all 180 remaining comments at once, with reasons and possible alternative labels. I reviewed every comment and initially accepted all suggestions. During the hard-case review, I changed record 144 from `analysis` to `reaction` and records 165 and 168 from `hot_take` to `reaction`. All 180 assisted rows are marked `pre-labelled, checked`. The original AI suggestions and the cold snapshot are retained in local review records.
+I chose 20 labels myself before AI pre-labeling, using the four definitions above. I then asked Codex to pre-label all 180 remaining comments at once, with reasons and possible alternative labels. I reviewed every comment and initially accepted all suggestions. During the hard-case review, I changed record 144 from `analysis` to `reaction` and records 165 and 168 from `hot_take` to `reaction`. All 180 pre-labeled rows are marked `pre-labelled, checked`.
+
+After a separate AI audit, I verified and accepted three corrections to my initial cold labels:
+
+| CSV record | Original cold label | Final label | Reason |
+|---|---|---|---|
+| 8 | `analysis` | `hot_take` | The prediction gives no specific supporting detail, consistent with the evidence threshold used for record 9. |
+| 35 | `reaction` | `hot_take` | It proposes a strategy and predicts the race outcome; humor does not change that main point. |
+| 72 | `analysis` | `reaction` | It reports Hamilton's decision without drawing a further conclusion. |
+
+The 17 unchanged cold rows retain `cold`. The three corrected rows have notes beginning `cold; corrected after AI review` and include `original_label=...`. Their current labels are the corrected training labels, not the original unaided answers. The original 20-row cold snapshot is unchanged in the local review records, and commit `43b318d` also preserves those initial answers. Any analysis of my unaided labeling must use those original answers. The original AI suggestions for the other 180 comments remain in the local review records.
 
 **Counts per label:**
 
 | Label | Count | Share |
 |---|---|---|
-| `analysis` | 19 | 9.5% |
-| `hot_take` | 32 | 16.0% |
+| `analysis` | 17 | 8.5% |
+| `hot_take` | 34 | 17.0% |
 | `question` | 17 | 8.5% |
 | `reaction` | 132 | 66.0% |
 | **Total** | **200** | **100%** |
@@ -233,11 +243,11 @@ of next unit's variance. -->
 
 - *What I asked for:* After my 20 cold labels, I asked Codex to pre-label all 180 remaining comments so I could review them together, instead of using the planned batches of 25.
 - *What came back:* A label and reason for every comment, with alternative labels for 61. The initial suggestions included `analysis` for record 144's list of Verstappen's session results, and `hot_take` for records 165 and 168.
-- *What I changed:* I initially accepted all 180 after review, then corrected those three to `reaction` during the hard-case discussion. I confirmed the reasons for records 23 and 144, supplied record 165 as my third hard case, and identified 168 as a related correction. The dataset section records the context limitation for 165 and 168 rather than claiming the boundary is fully resolved.
+- *What I changed:* I initially accepted all 180 after review, then corrected those three to `reaction` during the hard-case discussion. I confirmed the reasons for records 23 and 144, supplied record 165 as my third hard case, and identified 168 as a related correction. A later independent AI audit identified inconsistent cold labels in records 8, 35, and 72; I verified and accepted the suggested corrections recorded in the dataset section. The context limitation for 165 and 168 remains unresolved.
 
 **Pre-labelling disclosure:**
 
-Codex suggested labels for 180 of 200 real comments. I reviewed every one; they are marked `pre-labelled, checked`. I chose the other 20 before that assistance, confirmed that those choices were mine, and kept their `cold` labels unchanged. The CSV contains no synthetic examples. Codex also assisted collection, acceptance-criteria drafting and review, validation, and this write-up. No model training or confidence evaluation has run.
+Codex initially pre-labeled 180 of 200 real comments. I reviewed every one; they are marked `pre-labelled, checked`. I chose the other 20 before that assistance and confirmed that those choices were mine. I later accepted AI-reviewed corrections to three of those 20, so the final training labels contain 183 comments whose labels received AI input and 17 unchanged cold choices. Original cold labels remain preserved separately and in the corrected rows' notes. The CSV contains no synthetic examples. Codex also assisted collection, acceptance-criteria drafting and review, validation, and this write-up. No model training or confidence evaluation has run.
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
